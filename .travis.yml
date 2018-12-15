@@ -9,9 +9,10 @@ env:
 
 install:
   - docker build -t $HAZELCAST_IMAGE $HAZELCAST_IMAGE
-  - docker run --name $HAZELCAST_IMAGE -e HZ_LICENSE_KEY=$HZ_LICENSE_KEY -d --rm $HAZELCAST_IMAGE
+  - docker run --name ${HAZELCAST_IMAGE}-container -e HZ_LICENSE_KEY=$HZ_LICENSE_KEY -d --rm $HAZELCAST_IMAGE
   - sleep 10
-  - HZ_IP=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' $HAZELCAST_IMAGE)
+  - docker inspect ${HAZELCAST_IMAGE}-container
+  - HZ_IP=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' ${HAZELCAST_IMAGE}-container)
   - nc -z $HZ_IP 5701
 
 script:
