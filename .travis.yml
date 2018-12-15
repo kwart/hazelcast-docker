@@ -8,7 +8,11 @@ env:
   - HAZELCAST_IMAGE=hazelcast-oss
 
 install:
-- docker build -t $HAZELCAST_IMAGE $HAZELCAST_IMAGE
+  - docker build -t $HAZELCAST_IMAGE $HAZELCAST_IMAGE
+  - docker run --name $HAZELCAST_IMAGE -e HZ_LICENSE_KEY=$HZ_LICENSE_KEY -d --rm $HAZELCAST_IMAGE
+  - sleep 10
+  - HZ_IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $HAZELCAST_IMAGE)
+  - nc -z $HZ_IP 5701
 
 script:
 - true
