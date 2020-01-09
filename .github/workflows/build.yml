@@ -22,7 +22,7 @@ jobs:
       run: |
         if [ "$HAZELCAST_IMAGE" = "hazelcast-oss" -o -n "$HZ_LICENSE_KEY" ]; then
           docker run --name ${HAZELCAST_IMAGE}-container -e HZ_LICENSE_KEY=$HZ_LICENSE_KEY -d --rm $HAZELCAST_IMAGE
-          sleep 10
+          sleep 11
           HZ_IP=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' ${HAZELCAST_IMAGE}-container)
           nc -z $HZ_IP 5701
         else
