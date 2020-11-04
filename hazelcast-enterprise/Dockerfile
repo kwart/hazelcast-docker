@@ -1,4 +1,4 @@
-FROM registry.redhat.io/ubi8/ubi
+FROM registry.access.redhat.com/ubi8/ubi-minimal
 
 # Versions of Hazelcast and Hazelcast plugins
 ARG HZ_VERSION=4.0.3
@@ -57,11 +57,9 @@ COPY licenses /licenses
 # Install
 RUN mkdir -p "${HZ_HOME}/lib" "$HZ_CP_MOUNT" \
     && echo "Disabling subscription-manager plugin to prevent redundant logs" \
-    && sed -i 's/^enabled=.*/enabled=0/g' /etc/dnf/plugins/subscription-manager.conf \
-    && dnf config-manager --disable \
-    && dnf -y update-minimal --security --sec-severity=Important --sec-severity=Critical --setopt=tsflags=nodocs \
+    && microdnf -y update \
     && echo "Installing new packages" \
-    && dnf -y --setopt=tsflags=nodocs install java-11-openjdk &> /dev/null \
+    && microdnf -y --setopt=tsflags=nodocs install shadow-utils bash java-11-openjdk-headless apr openssl &> /dev/null \
     && echo "Downloading Hazelcast and related JARs" \
     && cd "${HZ_HOME}/lib" \
     && for JAR_URL in ${HAZELCAST_ALL_URL} ${CACHE_API_URL} ${PROMETHEUS_AGENT_URL} ${NETTY_URL} ${NETTY_TCNATIVE_URL} ${LOG4J2_URLS}; do curl -sf -O -L ${JAR_URL}; done \
@@ -71,7 +69,7 @@ RUN mkdir -p "${HZ_HOME}/lib" "$HZ_CP_MOUNT" \
     && chown -R $USER_UID:0 $HZ_HOME $HZ_CP_MOUNT \
     && chmod -R g=u "$HZ_HOME" \
     && chmod -R +r $HZ_HOME \
-    && dnf -y clean all && rm -rf /var/cache/dnf
+    && microdnf -y clean all
 
 WORKDIR ${HZ_HOME}
 
